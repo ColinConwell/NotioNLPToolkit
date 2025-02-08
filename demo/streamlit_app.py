@@ -6,6 +6,24 @@ import streamlit as st
 from notion_nlp import NotionClient, TextProcessor, DocumentHierarchy, Tagger
 from notion_nlp.exceptions import AuthenticationError, NotionNLPError
 
+# Configure Streamlit for Replit environment
+st.set_page_config(
+    page_title="Notion NLP Demo",
+    page_icon="📚",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Additional Streamlit configurations for Replit
+if os.environ.get('REPL_ID'):
+    st._config.update({
+        'server.address': '0.0.0.0',
+        'server.port': 8501,
+        'server.enableCORS': False,
+        'server.enableXsrfProtection': False,
+        'server.baseUrlPath': '',
+    })
+
 # Page config
 st.set_page_config(
     page_title="Notion NLP Demo",
