@@ -30,16 +30,8 @@ This demo showcases the core functionalities of the Notion NLP library:
 - Automated document tagging
 """)
 
-# Sidebar for API token input
-with st.sidebar:
-    st.header("Configuration")
-    notion_token = os.environ.get('NOTION_API_TOKEN')
-    if not notion_token:
-        notion_token = st.text_input("Enter your Notion API token:", type="password")
-        if notion_token:
-            os.environ['NOTION_API_TOKEN'] = notion_token
-
-# Initialize clients if token is available
+# Initialize clients if API token is available
+notion_token = os.environ.get('NOTION_API_TOKEN')
 if notion_token and not st.session_state.initialized:
     try:
         st.session_state.notion_client = NotionClient(notion_token)
@@ -49,7 +41,7 @@ if notion_token and not st.session_state.initialized:
     except Exception as e:
         st.error(f"Failed to initialize clients: {str(e)}")
 
-# Only show main content if initialized
+# Main content
 if st.session_state.initialized:
     # Create tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -181,4 +173,4 @@ if st.session_state.initialized:
         else:
             st.info("Please select a document from the Document List tab first.")
 else:
-    st.warning("Please provide a valid Notion API token to start using the application.")
+    st.error("Notion API token not found. Please ensure the NOTION_API_TOKEN environment variable is set.")
