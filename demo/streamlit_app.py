@@ -6,7 +6,7 @@ import streamlit as st
 from notion_nlp import NotionClient, TextProcessor, DocumentHierarchy, Tagger
 from notion_nlp.exceptions import AuthenticationError, NotionNLPError
 
-# Configure Streamlit for Replit environment
+# Configure Streamlit page
 st.set_page_config(
     page_title="Notion NLP Demo",
     page_icon="📚",
@@ -14,22 +14,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Additional Streamlit configurations for Replit
-if os.environ.get('REPL_ID'):
-    st._config.update({
-        'server.address': '0.0.0.0',
-        'server.port': 8501,
-        'server.enableCORS': False,
-        'server.enableXsrfProtection': False,
-        'server.baseUrlPath': '',
-    })
-
-# Page config
-st.set_page_config(
-    page_title="Notion NLP Demo",
-    page_icon="📚",
-    layout="wide"
-)
+# Initialize session state for storing objects
+if 'initialized' not in st.session_state:
+    st.session_state.initialized = False
+    st.session_state.documents = None
+    st.session_state.current_blocks = None
 
 # Title and description
 st.title("Notion NLP Library Demo")
@@ -40,12 +29,6 @@ This demo showcases the core functionalities of the Notion NLP library:
 - Natural Language Processing capabilities
 - Automated document tagging
 """)
-
-# Initialize session state for storing objects
-if 'initialized' not in st.session_state:
-    st.session_state.initialized = False
-    st.session_state.documents = None
-    st.session_state.current_blocks = None
 
 # Sidebar for API token input
 with st.sidebar:
