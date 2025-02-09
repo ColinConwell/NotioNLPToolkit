@@ -7,21 +7,19 @@ channel = "stable-24_05"
 runButton = "Project"
 
 [[workflows.workflow]]
-name = "Project"
-mode = "parallel"
+name = "Jupyter Notebook"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Jupyter Notebook"
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
 
 [[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Streamlit Demo"
+task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "NotionNLP Example"
+task = "shell.exec"
+args = "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --IdentityProvider.token='' --IdentityProvider.password_required='false'"
+waitForPort = 8888
 
 [[workflows.workflow]]
 name = "Jupyter Notebook"
@@ -35,23 +33,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"
+args = "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --IdentityProvider.token='' --IdentityProvider.password_required='false'"
 waitForPort = 8888
-
-[[workflows.workflow]]
-name = "Streamlit Demo"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port 8501 --server.address 0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
-waitForPort = 8501
 
 [[workflows.workflow]]
 name = "NotionNLP Example"
@@ -67,8 +50,40 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "python examples/check_access.py"
 
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Jupyter Notebook"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Streamlit Demo"
+
+[[workflows.workflow]]
+name = "Streamlit Demo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
+waitForPort = 8501
+
 [deployment]
-run = ["sh", "-c", "python -m spacy download en_core_web_sm && python examples/basic_usage.py"]
+run = [
+  "sh",
+  "-c",
+  "python -m spacy download en_core_web_sm && python examples/basic_usage.py",
+]
 
 [[ports]]
 localPort = 8501
