@@ -2,8 +2,8 @@
 Data models for the Notion NLP library.
 """
 from typing import Optional, List
-from pydantic import BaseModel
 from datetime import datetime
+from pydantic import BaseModel
 
 class Document(BaseModel):
     """Represent a Notion document."""
