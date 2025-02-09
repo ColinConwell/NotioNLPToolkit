@@ -1,4 +1,12 @@
 
+modules = ["python-3.11", "python3"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Streamlit Demo"
+
 [[workflows.workflow]]
 name = "Streamlit Demo"
 author = "agent"

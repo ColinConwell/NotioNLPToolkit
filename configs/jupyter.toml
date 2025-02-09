@@ -1,4 +1,12 @@
 
+modules = ["python-3.11", "python3"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Jupyter Notebook"
+
 [[workflows.workflow]]
 name = "Jupyter Notebook"
 author = "agent"
