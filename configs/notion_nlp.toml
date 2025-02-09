@@ -1,0 +1,14 @@
+
+[[workflows.workflow]]
+name = "NotionNLP Example"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python examples/check_access.py"
