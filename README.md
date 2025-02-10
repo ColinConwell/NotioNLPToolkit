@@ -1,10 +1,55 @@
-# Clone the repository
-git clone <repository-url>
-cd notion-nlp
+## Authentication Setup
 
-# Install dependencies
-pip install -e .
+### Getting Your Notion API Token
+
+1. Create a new integration:
+   1. Go to [Notion Integrations page](https://www.notion.so/my-integrations)
+   2. Click "New integration"
+   3. Name your integration (e.g., "NotionNLP Analysis")
+   4. Select the workspace where you'll use the integration
+   5. Set the capabilities needed (minimum: Read content)
+   6. Click "Submit" to create the integration
+
+2. Copy your integration token:
+   - Under "Internal Integration Token", click "Show" and copy the token
+   - This token starts with `secret_` and will be your `NOTION_API_TOKEN`
+
+### Setting Up Your Token
+
+You can set up your token in one of these ways:
+
+1. Environment variable (recommended):
+```bash
+export NOTION_API_TOKEN='your-notion-api-token'
 ```
+
+2. Using a `.env` file:
+```bash
+echo "NOTION_API_TOKEN=your-notion-api-token" > .env
+```
+
+3. During runtime (not recommended for production):
+```python
+from notion_nlp import NotionClient
+client = NotionClient("your-notion-api-token")
+```
+
+### Connecting Pages to Your Integration
+
+1. Share individual pages:
+   1. Open the Notion page you want to analyze
+   2. Click the `•••` menu in the top right corner
+   3. Select "Add connections"
+   4. Find and select your integration ("NotionNLP Analysis")
+   5. Click "Confirm" to grant access
+
+2. Share an entire database:
+   - Follow the same steps above on the database page
+   - All pages within the database will be accessible
+
+3. Verify connection:
+   - The integration icon should appear in the "Connections" section
+   - You can remove access anytime through the same menu
 
 ## Quick Start
 

@@ -27,9 +27,34 @@ name = "Project"
 mode = "parallel"
 author = "agent"
 
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m spacy download en_core_web_sm && PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info"
+
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Streamlit Demo"
+args = "Flask Server"
+
+[[workflows.workflow]]
+name = "Flask Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m spacy download en_core_web_sm && PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info"
+waitForPort = 8501
 
 [[ports]]
 localPort = 8501
