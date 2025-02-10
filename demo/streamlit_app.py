@@ -54,12 +54,36 @@ if st.session_state.initialized:
         "🏷️ Document Tagging"
     ])
 
+    @st.cache_data
+    def get_document_style():
+        return """
+        <style>
+        .document-list {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .document-selected {
+            background-color: #90EE90;
+            color: black;
+        }
+        .content-view {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        </style>
+        """
+
     # Document List Tab
     with tab1:
         st.header("Available Documents")
+        st.markdown(get_document_style(), unsafe_allow_html=True)
 
-        # Document list and content view columns
-        col_list, col_content = st.columns([1, 2])
+        # Document list and content view columns with adjusted widths
+        col_list, col_content = st.columns([1, 5])
 
         with col_list:
             if st.button("🔄 Refresh Documents"):
@@ -76,12 +100,13 @@ if st.session_state.initialized:
             if st.session_state.documents:
                 st.subheader("Select a Document")
                 for doc in st.session_state.documents:
-                    # Create a button for each document
-                    button_style = "primary" if doc.id == st.session_state.selected_doc_id else "secondary"
+                    # Create a styled button for each document
+                    selected_class = "document-selected" if doc.id == st.session_state.selected_doc_id else "document-list"
                     if st.button(
                         f"📄 {doc.title}",
                         key=f"view_{doc.id}",
-                        type=button_style,
+                        help=f"Last edited: {doc.last_edited_time}",
+                        use_container_width=True,
                     ):
                         try:
                             with st.spinner("Fetching content..."):
@@ -94,10 +119,17 @@ if st.session_state.initialized:
                             st.session_state.current_blocks = None
                             st.session_state.selected_doc_id = None
 
-        # Content viewing area
+                    # Apply styling based on selection status
+                    st.markdown(
+                        f"""<div class="{selected_class}"></div>""",
+                        unsafe_allow_html=True
+                    )
+
+        # Content viewing area with improved styling
         with col_content:
             if st.session_state.current_blocks and st.session_state.selected_doc_id:
-                st.subheader("Document Content")
+                st.markdown('<div class="content-view">', unsafe_allow_html=True)
+
                 # Display selected document title
                 selected_doc = next(
                     (doc for doc in st.session_state.documents if doc.id == st.session_state.selected_doc_id),
@@ -109,21 +141,28 @@ if st.session_state.initialized:
                 # Display content in a clean format
                 content_container = st.container()
                 with content_container:
+                    current_list_level = 0
                     for block in st.session_state.current_blocks:
                         if block.type == "paragraph":
                             st.write(block.content)
-                        elif block.type == "heading_1":
-                            st.markdown(f"# {block.content}")
-                        elif block.type == "heading_2":
-                            st.markdown(f"## {block.content}")
-                        elif block.type == "heading_3":
-                            st.markdown(f"### {block.content}")
+                            current_list_level = 0
+                        elif block.type.startswith("heading"):
+                            level = int(block.type[-1])
+                            st.markdown("#" * level + f" {block.content}")
+                            current_list_level = 0
                         elif block.type == "bulleted_list_item":
-                            st.markdown(f"• {block.content}")
+                            indent = "  " * current_list_level
+                            st.markdown(f"{indent}• {block.content}")
+                            current_list_level = min(current_list_level + 1, 3)
                         elif block.type == "numbered_list_item":
-                            st.markdown(f"1. {block.content}")
+                            indent = "  " * current_list_level
+                            st.markdown(f"{indent}1. {block.content}")
+                            current_list_level = min(current_list_level + 1, 3)
                         else:
                             st.text(f"{block.content}")
+                            current_list_level = 0
+
+                st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.info("Select a document from the list to view its content")
 
