@@ -4,8 +4,11 @@ import streamlit as st
 from notion_nlp import NotionClient, TextProcessor, DocumentHierarchy, Tagger
 from notion_nlp.exceptions import AuthenticationError, NotionNLPError
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Enhanced logging configuration
+logging.basicConfig(
+    level=logging.DEBUG,  # Changed to DEBUG for more detailed logs
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Configure Streamlit page
@@ -16,12 +19,39 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+logger.info("Starting Notion NLP Demo application")
+
 # Initialize session state for storing objects
 if 'initialized' not in st.session_state:
+    logger.info("Initializing session state")
     st.session_state.initialized = False
     st.session_state.documents = None
     st.session_state.current_blocks = None
     st.session_state.selected_doc_id = None
+
+# Initialize clients if API token is available
+notion_token = os.environ.get('NOTION_API_TOKEN')
+logger.debug(f"Notion API token present: {notion_token is not None}")
+
+if notion_token and not st.session_state.initialized:
+    try:
+        logger.info("Attempting to initialize Notion client")
+        st.session_state.notion_client = NotionClient(notion_token)
+        logger.info("Notion client initialized successfully")
+
+        logger.info("Initializing text processor")
+        st.session_state.text_processor = TextProcessor()
+        logger.info("Text processor initialized")
+
+        logger.info("Initializing tagger")
+        st.session_state.tagger = Tagger()
+        logger.info("Tagger initialized")
+
+        st.session_state.initialized = True
+        logger.info("All components initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize clients: {str(e)}", exc_info=True)
+        st.error(f"Failed to initialize clients: {str(e)}")
 
 # Title and description
 st.title("Notion NLP Library Demo")
@@ -32,17 +62,6 @@ This demo showcases the core functionalities of the Notion NLP library:
 - Natural Language Processing capabilities
 - Automated document tagging
 """)
-
-# Initialize clients if API token is available
-notion_token = os.environ.get('NOTION_API_TOKEN')
-if notion_token and not st.session_state.initialized:
-    try:
-        st.session_state.notion_client = NotionClient(notion_token)
-        st.session_state.text_processor = TextProcessor()
-        st.session_state.tagger = Tagger()
-        st.session_state.initialized = True
-    except Exception as e:
-        st.error(f"Failed to initialize clients: {str(e)}")
 
 # Main content
 if st.session_state.initialized:
@@ -98,32 +117,45 @@ if st.session_state.initialized:
         with col_content:
             if st.session_state.current_blocks and st.session_state.selected_doc_id:
                 st.subheader("Document Content")
-                # Display selected document title
+
+                # Display selected document title with improved styling
                 selected_doc = next(
                     (doc for doc in st.session_state.documents if doc.id == st.session_state.selected_doc_id),
                     None
                 )
                 if selected_doc:
-                    st.markdown(f"### 📄 {selected_doc.title}")
+                    st.markdown("""
+                    <div style='padding: 1rem; background-color: #f0f2f6; border-radius: 0.5rem; margin-bottom: 1rem;'>
+                        <h3 style='margin: 0;'>📄 {}</h3>
+                    </div>
+                    """.format(selected_doc.title), unsafe_allow_html=True)
 
-                # Display content in a clean format
-                content_container = st.container()
-                with content_container:
-                    for block in st.session_state.current_blocks:
-                        if block.type == "paragraph":
-                            st.write(block.content)
-                        elif block.type == "heading_1":
-                            st.markdown(f"# {block.content}")
-                        elif block.type == "heading_2":
-                            st.markdown(f"## {block.content}")
-                        elif block.type == "heading_3":
-                            st.markdown(f"### {block.content}")
-                        elif block.type == "bulleted_list_item":
-                            st.markdown(f"• {block.content}")
-                        elif block.type == "numbered_list_item":
-                            st.markdown(f"1. {block.content}")
-                        else:
-                            st.text(f"{block.content}")
+                    # Add content statistics
+                    total_blocks = len(st.session_state.current_blocks)
+                    st.markdown(f"**Total blocks:** {total_blocks}")
+
+                    # Display content in a scrollable container with improved formatting
+                    content_container = st.container()
+                    with content_container:
+                        for block in st.session_state.current_blocks:
+                            if block.type == "paragraph":
+                                st.write(block.content)
+                            elif block.type == "heading_1":
+                                st.markdown(f"<h1>{block.content}</h1>", unsafe_allow_html=True)
+                            elif block.type == "heading_2":
+                                st.markdown(f"<h2>{block.content}</h2>", unsafe_allow_html=True)
+                            elif block.type == "heading_3":
+                                st.markdown(f"<h3>{block.content}</h3>", unsafe_allow_html=True)
+                            elif block.type == "bulleted_list_item":
+                                st.markdown(f"<li>{block.content}</li>", unsafe_allow_html=True)
+                            elif block.type == "numbered_list_item":
+                                st.markdown(f"<li>{block.content}</li>", unsafe_allow_html=True)
+                            elif block.type == "code":
+                                st.code(block.content)
+                            elif block.type == "quote":
+                                st.markdown(f"> {block.content}")
+                            else:
+                                st.text(block.content)
             else:
                 st.info("Select a document from the list to view its content")
 
