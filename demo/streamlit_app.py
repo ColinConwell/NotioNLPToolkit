@@ -63,37 +63,45 @@ if st.session_state.initialized:
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
         }
         .document-selected {
             background-color: #90EE90;
             color: black;
+            font-weight: bold;
         }
         .content-view {
             background-color: #f5f5f5;
             padding: 20px;
             border-radius: 5px;
             margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .bullet-list {
+            margin-left: 20px;
+        }
+        .sub-bullet {
+            margin-left: 40px;
         }
         </style>
         """
 
-    # Document List Tab
+    # Document List Tab section
     with tab1:
         st.header("Available Documents")
         st.markdown(get_document_style(), unsafe_allow_html=True)
 
-        # Document list and content view columns with adjusted widths
+        # Use columns with specified ratios
         col_list, col_content = st.columns([1, 5])
 
         with col_list:
-            if st.button("🔄 Refresh Documents"):
+            if st.button("🔄 Refresh Documents", use_container_width=True):
                 try:
                     with st.spinner("Fetching documents..."):
                         documents = st.session_state.notion_client.list_documents()
                         st.session_state.documents = documents
                         st.success(f"Found {len(documents)} documents")
-                except AuthenticationError:
-                    st.error("Authentication failed. Please check your Notion API token.")
                 except Exception as e:
                     st.error(f"Error fetching documents: {str(e)}")
 
@@ -102,9 +110,11 @@ if st.session_state.initialized:
                 for doc in st.session_state.documents:
                     # Create a styled button for each document
                     selected_class = "document-selected" if doc.id == st.session_state.selected_doc_id else "document-list"
+                    button_label = f"📄 {doc.title}"
+
                     if st.button(
-                        f"📄 {doc.title}",
-                        key=f"view_{doc.id}",
+                        button_label,
+                        key=f"doc_{doc.id}",
                         help=f"Last edited: {doc.last_edited_time}",
                         use_container_width=True,
                     ):
@@ -113,7 +123,6 @@ if st.session_state.initialized:
                                 blocks = st.session_state.notion_client.get_document_content(doc.id)
                                 st.session_state.current_blocks = blocks
                                 st.session_state.selected_doc_id = doc.id
-                                st.success("Content loaded successfully")
                         except Exception as e:
                             st.error(f"Error loading content: {str(e)}")
                             st.session_state.current_blocks = None
@@ -121,11 +130,11 @@ if st.session_state.initialized:
 
                     # Apply styling based on selection status
                     st.markdown(
-                        f"""<div class="{selected_class}"></div>""",
+                        f"""<div class="{selected_class}">{doc.title}</div>""",
                         unsafe_allow_html=True
                     )
 
-        # Content viewing area with improved styling
+        # Content viewing area
         with col_content:
             if st.session_state.current_blocks and st.session_state.selected_doc_id:
                 st.markdown('<div class="content-view">', unsafe_allow_html=True)
@@ -138,7 +147,7 @@ if st.session_state.initialized:
                 if selected_doc:
                     st.markdown(f"### 📄 {selected_doc.title}")
 
-                # Display content in a clean format
+                # Display content with improved formatting
                 content_container = st.container()
                 with content_container:
                     current_list_level = 0
@@ -148,18 +157,28 @@ if st.session_state.initialized:
                             current_list_level = 0
                         elif block.type.startswith("heading"):
                             level = int(block.type[-1])
-                            st.markdown("#" * level + f" {block.content}")
+                            st.markdown(f"{'#' * level} {block.content}")
                             current_list_level = 0
                         elif block.type == "bulleted_list_item":
                             indent = "  " * current_list_level
-                            st.markdown(f"{indent}• {block.content}")
+                            st.markdown(
+                                f'<div class="bullet-list{" sub-bullet" if current_list_level > 0 else ""}">'
+                                f'{indent}• {block.content}'
+                                '</div>',
+                                unsafe_allow_html=True
+                            )
                             current_list_level = min(current_list_level + 1, 3)
                         elif block.type == "numbered_list_item":
                             indent = "  " * current_list_level
-                            st.markdown(f"{indent}1. {block.content}")
+                            st.markdown(
+                                f'<div class="bullet-list{" sub-bullet" if current_list_level > 0 else ""}">'
+                                f'{indent}1. {block.content}'
+                                '</div>',
+                                unsafe_allow_html=True
+                            )
                             current_list_level = min(current_list_level + 1, 3)
                         else:
-                            st.text(f"{block.content}")
+                            st.text(block.content)
                             current_list_level = 0
 
                 st.markdown('</div>', unsafe_allow_html=True)

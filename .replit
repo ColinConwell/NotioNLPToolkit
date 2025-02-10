@@ -19,12 +19,20 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
-waitForPort = 8501
+args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8502 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
+waitForPort = 8502
 
 [[workflows.workflow]]
-name = "Streamlit Demo"
+name = "Project"
 mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Streamlit Server"
+
+[[workflows.workflow]]
+name = "Streamlit Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -35,12 +43,16 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
-waitForPort = 8501
+args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8502 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
+waitForPort = 8502
 
 [[ports]]
 localPort = 8501
 externalPort = 3000
+
+[[ports]]
+localPort = 8502
+externalPort = 80
 
 [deployment]
 run = [
