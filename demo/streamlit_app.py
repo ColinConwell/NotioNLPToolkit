@@ -1,10 +1,12 @@
-"""
-Streamlit frontend for Notion NLP Library demonstration.
-"""
 import os
+import logging
 import streamlit as st
 from notion_nlp import NotionClient, TextProcessor, DocumentHierarchy, Tagger
 from notion_nlp.exceptions import AuthenticationError, NotionNLPError
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Configure Streamlit page
 st.set_page_config(
@@ -19,6 +21,7 @@ if 'initialized' not in st.session_state:
     st.session_state.initialized = False
     st.session_state.documents = None
     st.session_state.current_blocks = None
+    st.session_state.selected_doc_id = None
 
 # Title and description
 st.title("Notion NLP Library Demo")
@@ -55,37 +58,74 @@ if st.session_state.initialized:
     with tab1:
         st.header("Available Documents")
 
-        if st.button("🔄 Refresh Documents"):
-            try:
-                with st.spinner("Fetching documents..."):
-                    documents = st.session_state.notion_client.list_documents()
-                    st.session_state.documents = documents
-                    st.success(f"Found {len(documents)} documents")
-            except AuthenticationError:
-                st.error("Authentication failed. Please check your Notion API token.")
-            except Exception as e:
-                st.error(f"Error fetching documents: {str(e)}")
+        # Document list and content view columns
+        col_list, col_content = st.columns([1, 2])
 
-        if st.session_state.documents:
-            for doc in st.session_state.documents:
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.write(f"📄 {doc.title}")
-                with col2:
-                    if st.button("View", key=f"view_{doc.id}"):
+        with col_list:
+            if st.button("🔄 Refresh Documents"):
+                try:
+                    with st.spinner("Fetching documents..."):
+                        documents = st.session_state.notion_client.list_documents()
+                        st.session_state.documents = documents
+                        st.success(f"Found {len(documents)} documents")
+                except AuthenticationError:
+                    st.error("Authentication failed. Please check your Notion API token.")
+                except Exception as e:
+                    st.error(f"Error fetching documents: {str(e)}")
+
+            if st.session_state.documents:
+                st.subheader("Select a Document")
+                for doc in st.session_state.documents:
+                    # Create a button for each document
+                    button_style = "primary" if doc.id == st.session_state.selected_doc_id else "secondary"
+                    if st.button(
+                        f"📄 {doc.title}",
+                        key=f"view_{doc.id}",
+                        type=button_style,
+                    ):
                         try:
                             with st.spinner("Fetching content..."):
                                 blocks = st.session_state.notion_client.get_document_content(doc.id)
                                 st.session_state.current_blocks = blocks
+                                st.session_state.selected_doc_id = doc.id
                                 st.success("Content loaded successfully")
                         except Exception as e:
                             st.error(f"Error loading content: {str(e)}")
                             st.session_state.current_blocks = None
+                            st.session_state.selected_doc_id = None
 
-                if st.session_state.current_blocks and doc.id == st.session_state.current_blocks[0].id:
-                    with st.expander("View Content"):
-                        for block in st.session_state.current_blocks:
-                            st.markdown(f"**{block.type}**: {block.content}")
+        # Content viewing area
+        with col_content:
+            if st.session_state.current_blocks and st.session_state.selected_doc_id:
+                st.subheader("Document Content")
+                # Display selected document title
+                selected_doc = next(
+                    (doc for doc in st.session_state.documents if doc.id == st.session_state.selected_doc_id),
+                    None
+                )
+                if selected_doc:
+                    st.markdown(f"### 📄 {selected_doc.title}")
+
+                # Display content in a clean format
+                content_container = st.container()
+                with content_container:
+                    for block in st.session_state.current_blocks:
+                        if block.type == "paragraph":
+                            st.write(block.content)
+                        elif block.type == "heading_1":
+                            st.markdown(f"# {block.content}")
+                        elif block.type == "heading_2":
+                            st.markdown(f"## {block.content}")
+                        elif block.type == "heading_3":
+                            st.markdown(f"### {block.content}")
+                        elif block.type == "bulleted_list_item":
+                            st.markdown(f"• {block.content}")
+                        elif block.type == "numbered_list_item":
+                            st.markdown(f"1. {block.content}")
+                        else:
+                            st.text(f"{block.content}")
+            else:
+                st.info("Select a document from the list to view its content")
 
     # Document Hierarchy Tab
     with tab2:

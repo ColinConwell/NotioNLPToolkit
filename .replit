@@ -4,10 +4,11 @@ modules = ["python-3.11", "python3"]
 channel = "stable-24_05"
 
 [workflows]
-runButton = "Streamlit Demo"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Streamlit Demo"
+mode = "parallel"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -18,9 +19,21 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''"
+args = "python -m spacy download en_core_web_sm && PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info"
 waitForPort = 8501
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Streamlit Demo"
 
 [[ports]]
 localPort = 8501
 externalPort = 3000
+
+[deployment]
+run = ["sh", "-c", "python -m spacy download en_core_web_sm && PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info"]
