@@ -160,26 +160,23 @@ if st.session_state.initialized:
                             st.markdown(f"{'#' * level} {block.content}")
                             current_list_level = 0
                         elif block.type == "bulleted_list_item":
-                            indent = "  " * current_list_level
+                            indent = "  " * block.indent_level
                             st.markdown(
-                                f'<div class="bullet-list{" sub-bullet" if current_list_level > 0 else ""}">'
+                                f'<div class="bullet-list{" sub-bullet" if block.indent_level > 0 else ""}">'
                                 f'{indent}• {block.content}'
                                 '</div>',
                                 unsafe_allow_html=True
                             )
-                            current_list_level = min(current_list_level + 1, 3)
                         elif block.type == "numbered_list_item":
-                            indent = "  " * current_list_level
+                            indent = "  " * block.indent_level
                             st.markdown(
-                                f'<div class="bullet-list{" sub-bullet" if current_list_level > 0 else ""}">'
+                                f'<div class="bullet-list{" sub-bullet" if block.indent_level > 0 else ""}">'
                                 f'{indent}1. {block.content}'
                                 '</div>',
                                 unsafe_allow_html=True
                             )
-                            current_list_level = min(current_list_level + 1, 3)
                         else:
                             st.text(block.content)
-                            current_list_level = 0
 
                 st.markdown('</div>', unsafe_allow_html=True)
             else:

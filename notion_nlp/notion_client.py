@@ -127,7 +127,8 @@ class NotionClient:
         try:
             response = requests.get(
                 f"{self.base_url}/blocks/{document_id}/children",
-                headers=self.headers
+                headers=self.headers,
+                params={"page_size": 100}  # Increased page size for better performance
             )
 
             if response.status_code != 200:
@@ -138,10 +139,14 @@ class NotionClient:
                 raise NotionNLPError(f"Invalid response format: {data}")
 
             blocks = []
+            current_list_type = None
+            current_list_level = 0
+
             for block in data.get("results", []):
                 try:
                     block_type = block["type"]
                     content = ""
+                    indent_level = 0
 
                     # Extract text content based on block type
                     if block_type in block:
@@ -149,12 +154,35 @@ class NotionClient:
                         if rich_text and isinstance(rich_text, list):
                             content = rich_text[0].get("text", {}).get("content", "")
 
-                    blocks.append(Block(
+                    # Handle list indentation
+                    if block_type in ["bulleted_list_item", "numbered_list_item"]:
+                        if current_list_type != block_type:
+                            current_list_type = block_type
+                            current_list_level = 0
+                        else:
+                            # Check if this item should be indented
+                            previous_block = blocks[-1] if blocks else None
+                            if previous_block and previous_block.type == block_type:
+                                # If previous item had children or was a sublist, increase indent
+                                if previous_block.has_children or previous_block.indent_level > 0:
+                                    current_list_level = min(current_list_level + 1, 3)
+                                # If current item doesn't continue the list, reset indent
+                                elif not content.strip():
+                                    current_list_level = 0
+                        indent_level = current_list_level
+                    else:
+                        current_list_type = None
+                        current_list_level = 0
+
+                    block_obj = Block(
                         id=block["id"],
                         type=block_type,
                         content=content,
-                        has_children=block.get("has_children", False)
-                    ))
+                        has_children=block.get("has_children", False),
+                        indent_level=indent_level
+                    )
+                    blocks.append(block_obj)
+
                 except Exception as e:
                     print(f"Warning: Failed to process block {block.get('id', 'unknown')}: {str(e)}")
                     continue

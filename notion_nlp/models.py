@@ -11,6 +11,8 @@ class Document(BaseModel):
     title: str
     created_time: datetime
     last_edited_time: datetime
+    last_fetched: Optional[datetime] = None
+    etag: Optional[str] = None
 
 class Block(BaseModel):
     """Represent a block of content in a Notion document."""
@@ -18,6 +20,7 @@ class Block(BaseModel):
     type: str
     content: str
     has_children: bool = False
+    indent_level: int = 0
 
 class Tag(BaseModel):
     """Represent a tag applied to content."""
