@@ -58,17 +58,18 @@ if st.session_state.initialized:
     def get_document_style():
         return """
         <style>
-        .document-list {
+        /* Remove the document-list class since we'll style the buttons directly */
+        .stButton > button {
             background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-        .document-selected {
-            background-color: #90EE90;
             color: black;
+            width: 100%;
+            margin-bottom: 5px;
+            text-align: left;
+            transition: background-color 0.3s ease;
+        }
+        .stButton > button[data-selected="true"] {
+            background-color: #90EE90 !important;
+            color: black !important;
             font-weight: bold;
         }
         .content-view {
@@ -108,15 +109,14 @@ if st.session_state.initialized:
             if st.session_state.documents:
                 st.subheader("Select a Document")
                 for doc in st.session_state.documents:
-                    # Create a styled button for each document
-                    selected_class = "document-selected" if doc.id == st.session_state.selected_doc_id else "document-list"
+                    # Create styled button for each document
                     button_label = f"📄 {doc.title}"
-
                     if st.button(
                         button_label,
                         key=f"doc_{doc.id}",
                         help=f"Last edited: {doc.last_edited_time}",
                         use_container_width=True,
+                        type="secondary" if doc.id != st.session_state.selected_doc_id else "primary",
                     ):
                         try:
                             with st.spinner("Fetching content..."):
@@ -128,11 +128,6 @@ if st.session_state.initialized:
                             st.session_state.current_blocks = None
                             st.session_state.selected_doc_id = None
 
-                    # Apply styling based on selection status
-                    st.markdown(
-                        f"""<div class="{selected_class}">{doc.title}</div>""",
-                        unsafe_allow_html=True
-                    )
 
         # Content viewing area
         with col_content:
@@ -150,33 +145,23 @@ if st.session_state.initialized:
                 # Display content with improved formatting
                 content_container = st.container()
                 with content_container:
-                    current_list_level = 0
                     for block in st.session_state.current_blocks:
                         if block.type == "paragraph":
                             st.write(block.content)
-                            current_list_level = 0
                         elif block.type.startswith("heading"):
                             level = int(block.type[-1])
                             st.markdown(f"{'#' * level} {block.content}")
-                            current_list_level = 0
-                        elif block.type == "bulleted_list_item":
+                        elif block.type in ["bulleted_list_item", "numbered_list_item"]:
                             indent = "  " * block.indent_level
+                            bullet = "•" if block.type == "bulleted_list_item" else f"{block.indent_level + 1}."
                             st.markdown(
                                 f'<div class="bullet-list{" sub-bullet" if block.indent_level > 0 else ""}">'
-                                f'{indent}• {block.content}'
-                                '</div>',
-                                unsafe_allow_html=True
-                            )
-                        elif block.type == "numbered_list_item":
-                            indent = "  " * block.indent_level
-                            st.markdown(
-                                f'<div class="bullet-list{" sub-bullet" if block.indent_level > 0 else ""}">'
-                                f'{indent}1. {block.content}'
+                                f'{indent}{bullet} {block.content}'
                                 '</div>',
                                 unsafe_allow_html=True
                             )
                         else:
-                            st.text(block.content)
+                            st.write(block.content)
 
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
