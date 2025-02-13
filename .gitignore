@@ -1,5 +1,9 @@
 # Specific Paths
-
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
 
 # IDE cache
 .vscode/
@@ -47,63 +51,6 @@ generated-icon.png
 ehthumbs.db
 Thumbs.db
 
-# Rhistory files
-.Rhistory
-.Rapp.history
-
-# RData files
-.RData
-.RDataTmp
-.Ruserdata
-
-# R package build files
-*-Ex.R
-
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# OAuth2 token
-.httr-oauth
-
-# knitr, R markdown cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
-
-# R Environment Variables
-.Renviron
-
-# pkgdown site
-docs/
-
-# RStudio Connect folder
-rsconnect/
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Compiled source
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-
 # Distribution / packaging
 .Python
 build/
@@ -128,10 +75,6 @@ MANIFEST
 # PyInstaller
 *.manifest
 *.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
