@@ -132,7 +132,6 @@ if st.session_state.initialized:
         # Content viewing area
         with col_content:
             if st.session_state.current_blocks and st.session_state.selected_doc_id:
-                st.markdown('<div class="content-view">', unsafe_allow_html=True)
 
                 # Display selected document title
                 selected_doc = next(
