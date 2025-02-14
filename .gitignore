@@ -24,7 +24,6 @@ profile_default/
 ipython_config.py
 
 # Replit app
-uv.lock
 generated-icon.png
 
 # Packages / archives
