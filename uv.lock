@@ -1340,29 +1340,37 @@ name = "notion-nlp"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "jupyter" },
-    { name = "notebook" },
     { name = "notion-client" },
     { name = "pydantic" },
-    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "spacy" },
-    { name = "streamlit" },
     { name = "trafilatura" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+]
+notebook = [
+    { name = "jupyter" },
+    { name = "notebook" },
+]
+ui = [
+    { name = "streamlit" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "jupyter", specifier = ">=1.1.1" },
-    { name = "notebook", specifier = ">=7.3.2" },
+    { name = "jupyter", marker = "extra == 'notebook'", specifier = ">=1.1.1" },
+    { name = "notebook", marker = "extra == 'notebook'", specifier = ">=7.3.2" },
     { name = "notion-client", specifier = ">=2.3.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
-    { name = "pytest", specifier = ">=8.3.4" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.4" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "spacy", specifier = ">=3.8.4" },
-    { name = "streamlit", specifier = ">=1.42.0" },
+    { name = "streamlit", marker = "extra == 'ui'", specifier = ">=1.42.0" },
     { name = "trafilatura", specifier = ">=2.0.0" },
 ]
 
