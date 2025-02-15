@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
     "notion-client>=2.3.0",
     "pydantic>=2.10.6",
+    "pytest-mock>=3.14.0",
     "python-dotenv>=1.0.1",
     "requests>=2.32.3",
     "spacy>=3.8.4",
