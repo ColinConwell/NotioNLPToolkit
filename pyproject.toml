@@ -18,6 +18,8 @@ classifiers = [
 ]
 
 dependencies = [
+    "flask-login>=0.6.3",
+    "flask-wtf>=1.2.2",
     "notion-client>=2.3.0",
     "pydantic>=2.10.6",
     "pytest-mock>=3.14.0",

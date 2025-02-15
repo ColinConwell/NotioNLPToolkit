@@ -26,12 +26,12 @@ def test_list_documents(mocker):
             }
         ]
     }
-    
+
     mocker.patch('requests.post', return_value=mock_response)
-    
+
     client = NotionClient("fake_token")
     docs = client.list_documents()
-    
+
     assert len(docs) == 1
     assert isinstance(docs[0], Document)
     assert docs[0].title == "Test Doc"
@@ -45,17 +45,26 @@ def test_get_document_content(mocker):
             {
                 "id": "block-id",
                 "type": "paragraph",
-                "paragraph": {"text": [{"plain_text": "Test content"}]},
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {"content": "Test content"},
+                            "plain_text": "Test content"
+                        }
+                    ]
+                },
                 "has_children": False
             }
-        ]
+        ],
+        "has_more": False
     }
-    
+
     mocker.patch('requests.get', return_value=mock_response)
-    
+
     client = NotionClient("fake_token")
     blocks = client.get_document_content("doc-id")
-    
+
     assert len(blocks) == 1
     assert isinstance(blocks[0], Block)
     assert blocks[0].content == "Test content"
