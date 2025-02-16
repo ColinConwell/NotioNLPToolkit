@@ -11,8 +11,7 @@ from notion_nlp.exceptions import AuthenticationError, NotionNLPError
 # Configure logging with more detail
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Log startup information
@@ -21,12 +20,10 @@ logger.info(f"Python version: {os.sys.version}")
 
 try:
     # Configure Streamlit page
-    st.set_page_config(
-        page_title="Notion NLP Demo",
-        page_icon="📚",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
+    st.set_page_config(page_title="Notion NLP Demo",
+                       page_icon="📚",
+                       layout="wide",
+                       initial_sidebar_state="expanded")
     logger.info("Streamlit page configuration completed")
 
     # Initialize session state for storing objects
@@ -64,9 +61,7 @@ try:
     if st.session_state.initialized:
         # Create tabs
         tab1, tab2, tab3, tab4 = st.tabs([
-            "📑 Document List",
-            "🌳 Document Hierarchy",
-            "🔍 NLP Analysis",
+            "📑 Document List", "🌳 Document Hierarchy", "🔍 NLP Analysis",
             "🏷️ Document Tagging"
         ])
 
@@ -81,12 +76,15 @@ try:
                 if st.button("🔄 Refresh Documents", use_container_width=True):
                     try:
                         with st.spinner("Fetching documents..."):
-                            documents = st.session_state.notion_client.list_documents()
+                            documents = st.session_state.notion_client.list_documents(
+                            )
                             st.session_state.documents = documents
                             if documents:
                                 st.success(f"Found {len(documents)} documents")
                             else:
-                                st.info("No documents found. Make sure you've shared some pages with the integration.")
+                                st.info(
+                                    "No documents found. Make sure you've shared some pages with the integration."
+                                )
                     except Exception as e:
                         st.error(f"Error fetching documents: {str(e)}")
                         logger.error(f"Document fetch error: {str(e)}")
@@ -97,19 +95,24 @@ try:
                         # Create styled button for each document
                         button_label = f"📄 {doc.title}"
                         if st.button(
-                            button_label,
-                            key=f"doc_{doc.id}",
-                            help=f"Last edited: {doc.last_edited_time}",
-                            use_container_width=True,
-                            type="secondary" if doc.id != st.session_state.selected_doc_id else "primary",
+                                button_label,
+                                key=f"doc_{doc.id}",
+                                help=f"Last edited: {doc.last_edited_time}",
+                                use_container_width=True,
+                                type="secondary"
+                                if doc.id != st.session_state.selected_doc_id
+                                else "primary",
                         ):
                             try:
                                 with st.spinner("Fetching content..."):
-                                    blocks = st.session_state.notion_client.get_document_content(doc.id)
+                                    blocks = st.session_state.notion_client.get_document_content(
+                                        doc.id)
                                     st.session_state.current_blocks = blocks
                                     st.session_state.selected_doc_id = doc.id
                                     if not blocks:
-                                        st.warning("No content found in this document.")
+                                        st.warning(
+                                            "No content found in this document."
+                                        )
                             except Exception as e:
                                 st.error(f"Error loading content: {str(e)}")
                                 logger.error(f"Content load error: {str(e)}")
@@ -122,9 +125,7 @@ try:
                     # Find selected document
                     selected_doc = next(
                         (doc for doc in st.session_state.documents
-                         if doc.id == st.session_state.selected_doc_id),
-                        None
-                    )
+                         if doc.id == st.session_state.selected_doc_id), None)
 
                     if selected_doc:
                         st.markdown(f"### 📄 {selected_doc.title}")
@@ -137,13 +138,16 @@ try:
                                     st.write(block.content)
                                 elif block.type.startswith("heading"):
                                     level = int(block.type[-1])
-                                    st.markdown(f"{'#' * level} {block.content}")
-                                elif block.type in ["bulleted_list_item", "numbered_list_item"]:
+                                    st.markdown(
+                                        f"{'#' * level} {block.content}")
+                                elif block.type in [
+                                        "bulleted_list_item",
+                                        "numbered_list_item"
+                                ]:
                                     indent = "  " * block.indent_level
                                     bullet = "•" if block.type == "bulleted_list_item" else f"{block.indent_level + 1}."
                                     st.markdown(
-                                        f'{indent}{bullet} {block.content}'
-                                    )
+                                        f'{indent}{bullet} {block.content}')
                                 elif block.type == "code":
                                     st.code(block.content)
                                 elif block.type == "quote":
@@ -153,7 +157,8 @@ try:
                                 else:
                                     st.write(block.content)
                 else:
-                    st.info("Select a document from the list to view its content")
+                    st.info(
+                        "Select a document from the list to view its content")
 
         # Document Hierarchy Tab
         with tab2:
@@ -164,13 +169,16 @@ try:
                     with st.spinner("Building hierarchy..."):
                         try:
                             hierarchy = DocumentHierarchy()
-                            root = hierarchy.build_hierarchy(st.session_state.current_blocks)
+                            root = hierarchy.build_hierarchy(
+                                st.session_state.current_blocks)
                             st.json(hierarchy.to_dict())
                         except Exception as e:
                             st.error(f"Error building hierarchy: {str(e)}")
                             logger.error(f"Hierarchy build error: {str(e)}")
             else:
-                st.info("Please select a document from the Document List tab first.")
+                st.info(
+                    "Please select a document from the Document List tab first."
+                )
 
         # NLP Analysis Tab
         with tab3:
@@ -180,15 +188,20 @@ try:
                 if st.button("🔍 Analyze Text"):
                     with st.spinner("Processing text..."):
                         try:
-                            processed = st.session_state.text_processor.process_blocks(st.session_state.current_blocks)
+                            processed = st.session_state.text_processor.process_blocks(
+                                st.session_state.current_blocks)
 
                             for block in processed:
-                                with st.expander(f"Analysis for: {block['content'][:50]}..."):
+                                with st.expander(
+                                        f"Analysis for: {block['content'][:50]}..."
+                                ):
                                     # Named Entities
                                     st.subheader("🏷️ Named Entities")
                                     if block['entities']:
                                         for entity in block['entities']:
-                                            st.write(f"- {entity['text']} ({entity['label']})")
+                                            st.write(
+                                                f"- {entity['text']} ({entity['label']})"
+                                            )
                                     else:
                                         st.info("No named entities found.")
 
@@ -210,7 +223,9 @@ try:
                             st.error(f"Error analyzing text: {str(e)}")
                             logger.error(f"Text analysis error: {str(e)}")
             else:
-                st.info("Please select a document from the Document List tab first.")
+                st.info(
+                    "Please select a document from the Document List tab first."
+                )
 
         # Document Tagging Tab
         with tab4:
@@ -219,43 +234,59 @@ try:
             if st.session_state.current_blocks:
                 custom_tags = st.text_input(
                     "Add custom tags (comma-separated)",
-                    value="important, review, followup"
-                )
+                    value="important, review, followup")
 
                 if st.button("🏷️ Generate Tags"):
                     with st.spinner("Generating tags..."):
                         try:
                             # Add custom tags
-                            custom_tag_list = [tag.strip() for tag in custom_tags.split(",") if tag.strip()]
-                            st.session_state.tagger.add_custom_tags(custom_tag_list)
+                            custom_tag_list = [
+                                tag.strip() for tag in custom_tags.split(",")
+                                if tag.strip()
+                            ]
+                            st.session_state.tagger.add_custom_tags(
+                                custom_tag_list)
 
                             # Process each block
                             for block in st.session_state.current_blocks:
-                                with st.expander(f"Tags for: {block.content[:50]}..."):
+                                with st.expander(
+                                        f"Tags for: {block.content[:50]}..."):
                                     # Generate and display tags
-                                    tags = st.session_state.tagger.generate_tags(block)
+                                    tags = st.session_state.tagger.generate_tags(
+                                        block)
                                     st.subheader("Generated Tags")
                                     if tags:
                                         for tag in tags:
-                                            st.write(f"- {tag.name} ({tag.type}: {tag.category})")
+                                            st.write(
+                                                f"- {tag.name} ({tag.type}: {tag.category})"
+                                            )
                                     else:
                                         st.info("No tags generated.")
 
                                     # Analyze and display sentiment
-                                    sentiment = st.session_state.tagger.analyze_sentiment(block.content)
+                                    sentiment = st.session_state.tagger.analyze_sentiment(
+                                        block.content)
                                     st.subheader("Sentiment Analysis")
                                     col1, col2 = st.columns(2)
                                     with col1:
-                                        st.metric("Positive", f"{sentiment['positive']:.1%}")
+                                        st.metric(
+                                            "Positive",
+                                            f"{sentiment['positive']:.1%}")
                                     with col2:
-                                        st.metric("Negative", f"{sentiment['negative']:.1%}")
+                                        st.metric(
+                                            "Negative",
+                                            f"{sentiment['negative']:.1%}")
                         except Exception as e:
                             st.error(f"Error generating tags: {str(e)}")
                             logger.error(f"Tag generation error: {str(e)}")
             else:
-                st.info("Please select a document from the Document List tab first.")
+                st.info(
+                    "Please select a document from the Document List tab first."
+                )
     else:
-        st.error("Notion API token not found. Please ensure the NOTION_API_TOKEN environment variable is set.")
+        st.error(
+            "Notion API token not found. Please ensure the NOTION_API_TOKEN environment variable is set."
+        )
 
 except Exception as e:
     error_msg = f"Startup error: {str(e)}\n{traceback.format_exc()}"
