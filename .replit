@@ -4,7 +4,6 @@ modules = ["python-3.11", "python3"]
 channel = "stable-24_05"
 
 [workflows]
-runButton = "Streamlit Demo"
 
 [[workflows.workflow]]
 name = "Streamlit Demo"
@@ -29,5 +28,5 @@ externalPort = 80
 run = [
   "sh",
   "-c",
-  "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info"
+  "python -m spacy download en_core_web_sm && streamlit run demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath='' --logger.level=info",
 ]
