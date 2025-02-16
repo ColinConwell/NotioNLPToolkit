@@ -8,7 +8,7 @@ channel = "stable-24_05"
 runButton = "Project"
 
 [[workflows.workflow]]
-name = "Streamlit Demo"
+name = "Project"
 mode = "parallel"
 author = "agent"
 
@@ -18,14 +18,5 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "packager.installForAll"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "bash launch.sh --install-spacy"
-waitForPort = 8501
-
 [deployment]
 run = ["sh", "-c", "bash launch.sh"]
-
-[[ports]]
-localPort = 8502
-externalPort = 80
