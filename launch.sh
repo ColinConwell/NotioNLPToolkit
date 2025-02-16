@@ -1,8 +1,10 @@
+
 #!/bin/bash
 
 # Default values
 STOP_ON_ERROR=false
 PORT=8501
+INSTALL_SPACY=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -14,6 +16,10 @@ while [[ $# -gt 0 ]]; do
     --port)
       PORT="$2"
       shift
+      shift
+      ;;
+    --install-spacy)
+      INSTALL_SPACY=true
       shift
       ;;
     *)
@@ -32,10 +38,16 @@ else
   python -m pytest tests/ -v
 fi
 
-echo "Downloading spaCy model..."
-python -m spacy download en_core_web_sm
+if [ "$INSTALL_SPACY" = true ]; then
+  echo "Downloading spaCy model..."
+  python -m spacy download en_core_web_sm
+fi
 
 echo "Starting Streamlit app on port $PORT..."
-streamlit run demo/streamlit_app.py --server.port=$PORT \
-  --server.address=0.0.0.0 --server.enableCORS=false \
-  --server.enableXsrfProtection=false --server.baseUrlPath=''
+PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py \
+  --server.port=$PORT \
+  --server.address=0.0.0.0 \
+  --server.enableCORS=false \
+  --server.enableXsrfProtection=false \
+  --server.baseUrlPath='' \
+  --logger.level=debug
