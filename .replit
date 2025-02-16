@@ -24,7 +24,7 @@ args = "bash launch.sh --install-spacy"
 waitForPort = 8501
 
 [[ports]]
-localPort = 8501
+localPort = 8502
 externalPort = 80
 
 [deployment]
