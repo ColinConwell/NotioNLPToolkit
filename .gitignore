@@ -1,11 +1,8 @@
 # Specific Paths
-*.egg-info/
-__pycache__/
-*.pyc
-*.pyo
-.pytest_cache/
+.cursorignore
 
 # IDE cache
+.cursorignore
 .vscode/
 .jupyter/
 .pretzel/
@@ -70,6 +67,14 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# PyTests
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
 
 # PyInstaller
 *.manifest

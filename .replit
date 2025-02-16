@@ -1,5 +1,4 @@
 modules = ["python-3.11", "python3"]
-run = "bash launch.sh"
 
 [nix]
 channel = "stable-24_05"
@@ -21,19 +20,9 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = """
-
 python -m spacy download en_core_web_sm && PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py     --server.port=8502 --server.address=0.0.0.0     --server.enableCORS=false --server.enableXsrfProtection=false     --server.baseUrlPath='' --logger.level=debug
     """
-waitForPort = 8502
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Streamlit Demo"
+waitForPort = 8501
 
 [[ports]]
 localPort = 8501
