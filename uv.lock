@@ -1400,6 +1400,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "spacy" },
+    { name = "streamlit" },
     { name = "trafilatura" },
 ]
 
@@ -1428,6 +1429,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "spacy", specifier = ">=3.8.4" },
+    { name = "streamlit", specifier = ">=1.42.0" },
     { name = "streamlit", marker = "extra == 'ui'", specifier = ">=1.42.0" },
     { name = "trafilatura", specifier = ">=2.0.0" },
 ]

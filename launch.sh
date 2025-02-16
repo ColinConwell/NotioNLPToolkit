@@ -36,4 +36,6 @@ echo "Downloading spaCy model..."
 python -m spacy download en_core_web_sm
 
 echo "Starting Streamlit app on port $PORT..."
-streamlit run demo/streamlit_app.py --server.port=$PORT --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.baseUrlPath=''
+streamlit run demo/streamlit_app.py --server.port=$PORT \
+  --server.address=0.0.0.0 --server.enableCORS=false \
+  --server.enableXsrfProtection=false --server.baseUrlPath=''
