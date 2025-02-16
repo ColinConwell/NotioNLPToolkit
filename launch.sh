@@ -3,8 +3,8 @@
 
 # Default values
 STOP_ON_ERROR=false
-PORT=8501
 INSTALL_SPACY=false
+PORT=8501
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -49,5 +49,5 @@ PYTHONUNBUFFERED=1 streamlit run demo/streamlit_app.py \
   --server.address=0.0.0.0 \
   --server.enableCORS=false \
   --server.enableXsrfProtection=false \
-  --server.baseUrlPath='' \
-  --logger.level=debug
+  --logger.level=debug \
+  --server.baseUrlPath=''

@@ -23,9 +23,9 @@ task = "shell.exec"
 args = "bash launch.sh --install-spacy"
 waitForPort = 8501
 
+[deployment]
+run = ["sh", "-c", "bash launch.sh"]
+
 [[ports]]
 localPort = 8502
 externalPort = 80
-
-[deployment]
-run = ["sh", "-c", "bash launch.sh"]
