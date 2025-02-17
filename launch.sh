@@ -5,6 +5,7 @@
 STOP_ON_ERROR=false
 INSTALL_SPACY=false
 PORT=8501
+CLEAN_PYTEST_CACHE=true
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -20,6 +21,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --install-spacy)
       INSTALL_SPACY=true
+      shift
+      ;;
+    --clean-pytest-cache)
+      CLEAN_PYTEST_CACHE=true
       shift
       ;;
     *)
@@ -41,6 +46,11 @@ fi
 if [ "$INSTALL_SPACY" = true ]; then
   echo "Downloading spaCy model..."
   python -m spacy download en_core_web_sm
+fi
+
+if [ "$CLEAN_PYTEST_CACHE" = true ]; then
+  echo "Cleaning pytest cache..."
+  rm -rf .pytest_cache
 fi
 
 echo "Starting Streamlit app on port $PORT..."
