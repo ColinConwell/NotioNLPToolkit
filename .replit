@@ -5,10 +5,10 @@ modules = ["python-3.11", "python3"]
 channel = "stable-24_05"
 
 [workflows]
-runButton = "Project"
+runButton = "Streamlit Demo"
 
 [[workflows.workflow]]
-name = "Project"
+name = "Streamlit Demo"
 mode = "parallel"
 author = "agent"
 
@@ -18,5 +18,14 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "packager.installForAll"
 
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash launch.sh --install-spacy --port 8501"
+waitForPort = 8501
+
 [deployment]
 run = ["sh", "-c", "bash launch.sh"]
+
+[[ports]]
+localPort = 8501
+externalPort = 80
