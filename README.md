@@ -5,14 +5,17 @@
 1. Create a new integration:
    1. Go to [Notion Integrations page](https://www.notion.so/my-integrations)
    2. Click "New integration"
-   3. Name your integration (e.g., "NotionNLP Analysis")
-   4. Select the workspace where you'll use the integration
-   5. Set the capabilities needed (minimum: Read content)
-   6. Click "Submit" to create the integration
+   3. Name your integration (e.g., "NLP Analysis")*
+   5. Select the workspace where you'll use the integration
+   6. Set the capabilities needed (minimum: Read content)
+   7. Click "Submit" to create the integration
+
+\***NOTE**: Notion does not allow the use of the word "Notion" in custom integrations.
 
 2. Copy your integration token:
    - Under "Internal Integration Token", click "Show" and copy the token
    - This token starts with `secret_` and will be your `NOTION_API_TOKEN`
+
 
 ### Setting Up Your Token
 
@@ -102,3 +105,11 @@ Or run with test validation:
 
 ```bash
 python -m pytest tests/
+```
+
+## Similar Tools
+
+(Ones I arguably should have known about before making this):
+
+- [Zomory Integration](https://zomory.com/)
+- [dario-github/notion-nlp](https://github.com(dario-github/notion-nlp))
